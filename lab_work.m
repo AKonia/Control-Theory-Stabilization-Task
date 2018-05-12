@@ -3,11 +3,26 @@ clear all;
 close all;
 graphics_toolkit fltk;
 
+
+% Управление отрисовкой
+square_size = 5.0;
+draw_lines = 1;
+
+
+
+
+
+
+
+
+
+
+
 function [t, y] = custom_ode(x_coord, y_coord, w, a, b, u0)
   back_a = a;
   back_b = b;
   back_u0 = u0;
-  calc_step = 0.1;
+  calc_step = 0.01;
   max_time = 50.0;
   timing = 0.0;
   
@@ -46,21 +61,24 @@ function [t, y] = custom_ode(x_coord, y_coord, w, a, b, u0)
     for indx = [1:1:length(y)]
       last_control = is_control_type_smart; 
       if(abs(y(indx)*[a;b]) < u0)
-        is_control_type_smart = 1;
+        is_control_type_smart = 1
       else
-        is_control_type_smart = 0;
+        is_control_type_smart = 0
       endif
         
       if(is_control_type_smart != last_control)
-        descision_y = [descision_y; y(1:indx-1, :)]
-        timing += indx*calc_step;
         p_x = y(indx, 1);
         p_y = y(indx, 2);
+        timing += calc_step;
+        break;
       endif
-        
+        descision_y = [descision_y; y(indx, :)];
+        timing += calc_step;
     endfor
   endwhile
-  [t, y] = [[0:calc_step:max_time], descision_y];
+  t = [0:calc_step:max_time];
+  y = descision_y;
+  %[t, y] = [[0:calc_step:max_time], ];
   length(t)
   length(y)
 endfunction
@@ -69,12 +87,14 @@ endfunction
 
 
 hold on;
-axis([-1.5 1.5 -1.5 1.5]);
+axis([-square_size square_size -square_size square_size]);
 draw_curves = 1;
-plot([-1.5:0.1:1.5], 1 - 2*[-1.5:0.1:1.5], 'linewidth', 2, 'k');
-plot([-1.5:0.1:1.5], -1 - 2*[-1.5:0.1:1.5], 'linewidth', 2, 'k');
+if(draw_lines)
+    plot([-1.5:0.1:1.5], 1 - 2*[-1.5:0.1:1.5], 'linewidth', 2, 'k');
+    plot([-1.5:0.1:1.5], -1 - 2*[-1.5:0.1:1.5], 'linewidth', 2, 'k');
+endif
 while(draw_curves == 1)
   [x_coord, y_coord] = ginput(1);
-  [t,y] = custom_ode(x_coord, y_coord, 0.5, 2, 1, 0.0);
+  [t,y] = custom_ode(x_coord, y_coord, 1, -2.0, -3, 5.0);
   plot(y(:,1), y(:,2), 'linewidth', 1);
 endwhile
