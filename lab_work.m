@@ -1,24 +1,24 @@
-% Copyright 2018 Alexandr Konakov
+% Copyright 2018 Александр Конаков
 clear all;
 close all;
 graphics_toolkit fltk;
 
 
-% Управление отрисовкой
+% Управление отрисовкой и задачей
 square_size = 5.0;
-draw_lines = 1;
+draw_lines = 0;
 
-
-
-
-
-
-
+global_a = -0.3; % a < -w^2
+global_b = -0.1; % b < 0
+global_w = 0.5; %
+global_u0 = 1; %
+global global_isLinearSystem = 1;
 
 
 
 
 function [t, y] = custom_ode(x_coord, y_coord, w, a, b, u0)
+  global global_isLinearSystem;
   back_a = a;
   back_b = b;
   back_u0 = u0;
@@ -49,9 +49,13 @@ function [t, y] = custom_ode(x_coord, y_coord, w, a, b, u0)
       b = 0;
       u0 = back_u0;
     endif  
-  
-    lab_sys_linear_case = @(t,y) [y(2); (w^2)*y(1) + a*y(1) + b*y(2) + u0];
-
+    lab_sys_linear_case = 0;
+    if(global_isLinearSystem)
+      lab_sys_linear_case = @(t,y) [y(2); (w^2)*y(1) + a*y(1) + b*y(2) + u0];
+    else
+      lab_sys_linear_case = @(t,y) [y(2); (w^2)*sin(y(1)) + a*y(1) + b*y(2) + u0];
+    endif
+    
     [t, y] = ode45(lab_sys_linear_case, [timing:calc_step:max_time], [p_x, p_y]);
 
     a = back_a;
@@ -95,6 +99,6 @@ if(draw_lines)
 endif
 while(draw_curves == 1)
   [x_coord, y_coord] = ginput(1);
-  [t,y] = custom_ode(x_coord, y_coord, 1, -2.0, -3, 5.0);
+  [t,y] = custom_ode(x_coord, y_coord, global_w, global_a, global_b, global_u0);
   plot(y(:,1), y(:,2), 'linewidth', 1);
 endwhile
