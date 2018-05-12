@@ -9,7 +9,7 @@ square_size = 5.0;
 draw_lines = 0;
 
 global_a = -0.3; % a < -w^2
-global_b = -0.1; % b < 0
+global_b = -0.0005; % b < 0
 global_w = 0.5; %
 global_u0 = 1; %
 global global_isLinearSystem = 1;
