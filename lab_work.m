@@ -6,13 +6,13 @@ graphics_toolkit fltk;
 
 % Управление отрисовкой и задачей
 square_size = 5.0;
-draw_lines = 0;
+draw_lines = 1;
 
-global_a = -0.3; % a < -w^2
-global_b = -0.0005; % b < 0
+global_a = -0.28; % a < -w^2
+global_b = -0.1; % b < 0
 global_w = 0.5; %
-global_u0 = 1; %
-global global_isLinearSystem = 1;
+global_u0 = 1.0; %
+global global_isLinearSystem = 2;
 
 
 
@@ -47,7 +47,7 @@ function [t, y] = custom_ode(x_coord, y_coord, w, a, b, u0)
     else
       a = 0;
       b = 0;
-      u0 = back_u0;
+      u0 = back_u0 * sign([a, b]*[p_x; p_y]);
     endif  
     lab_sys_linear_case = 0;
     if(global_isLinearSystem)
@@ -61,13 +61,13 @@ function [t, y] = custom_ode(x_coord, y_coord, w, a, b, u0)
     a = back_a;
     b = back_b;
     u0 = back_u0;
-      
+    
     for indx = [1:1:length(y)]
       last_control = is_control_type_smart; 
       if(abs(y(indx)*[a;b]) < u0)
-        is_control_type_smart = 1
+        is_control_type_smart = 1;
       else
-        is_control_type_smart = 0
+        is_control_type_smart = 0;
       endif
         
       if(is_control_type_smart != last_control)
@@ -82,7 +82,7 @@ function [t, y] = custom_ode(x_coord, y_coord, w, a, b, u0)
   endwhile
   t = [0:calc_step:max_time];
   y = descision_y;
-  %[t, y] = [[0:calc_step:max_time], ];
+  t = t(1:length(y));
   length(t)
   length(y)
 endfunction
@@ -94,8 +94,9 @@ hold on;
 axis([-square_size square_size -square_size square_size]);
 draw_curves = 1;
 if(draw_lines)
-    plot([-1.5:0.1:1.5], 1 - 2*[-1.5:0.1:1.5], 'linewidth', 2, 'k');
-    plot([-1.5:0.1:1.5], -1 - 2*[-1.5:0.1:1.5], 'linewidth', 2, 'k');
+	fi_dot = [-10:0.1:10];
+    plot(fi_dot, ( global_u0 - global_a*fi_dot)/global_b, 'linewidth', 2, 'k');
+    plot(fi_dot, (-global_u0 - global_a*fi_dot)/global_b, 'linewidth', 2, 'k');
 endif
 while(draw_curves == 1)
   [x_coord, y_coord] = ginput(1);
