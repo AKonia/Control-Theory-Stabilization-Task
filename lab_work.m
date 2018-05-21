@@ -10,9 +10,9 @@ draw_lines = 1;
 
 global_a = -2; % a < -w^2
 global_b = -1; % b < 0
-global_w = 1; %
-global_u0 = 2.0; %
-global global_isLinearSystem = 1;
+global_w = 1.0; %
+global_u0 = 1.0; %
+global global_isLinearSystem = 2;
 
 
 function [t, y] = custom_ode(x_coord, y_coord, w, a, b, u0)
@@ -37,7 +37,7 @@ function [t, y] = custom_ode(x_coord, y_coord, w, a, b, u0)
   endif
   
   while(timing < max_time)
-    printf("Iteration  WHILE\n");
+    %printf("Iteration  WHILE\n");
     if(is_control_type_smart)
       a = back_a;
       b = back_b;
@@ -117,29 +117,13 @@ if(draw_lines)
     else
       lab_sys_linear_case = @(t,y) [y(2); (w^2)*sin(y(1)) + a*y(1) + b*y(2) + u0];
     endif
-    
-    
-    
-    
-    
+
     [t, y] = ode45(lab_sys_linear_case, [0:-calc_step:-10], [root_x_right, root_y_right]);
     desc = [];
-    next_point = 0;
-    last_t = 0;
+
     for indx = [1:1:length(y)]
-    	if(abs(y(indx, :)*[a;b]) < global_u0)
+    	if(abs(y(indx, :)*[a;b]) > global_u0 + 0.0001)
     		desc = y(1:indx, :);
-    		next_point = y(indx, :);
-    		last_t = t(indx);
-    		break;
-    	endif
-    endfor
-    
-	[t, y] = ode45(lab_sys_linear_case, [last_t:-calc_step:-10], next_point);    
-    desc = [];
-    for indx = [1:1:length(y)]
-    	if(abs(y(indx, :)*[a;b]) > global_u0)
-    		desc = [desc, y(1:indx, :)];
     		break;
     	endif
     endfor
@@ -147,36 +131,14 @@ if(draw_lines)
     
     [t, y] = ode45(lab_sys_linear_case, [0:-calc_step:-10], [root_x_left, root_y_left]);
     for indx = [1:1:length(y)]
-    	if(abs(y(indx, :)*[a;b]) < global_u0)
+    	if(abs(y(indx, :)*[a;b]) > global_u0 + 0.0001)
+    		
     		desc = y(1:indx, :);
-    		next_point = y(indx, :);
-    		break;
-    	endif
-    endfor
-    
-    [t, y] = ode45(lab_sys_linear_case, [last_t:-calc_step:-10], next_point);    
-    desc = [];
-    for indx = [1:1:length(y)]
-    	if(abs(y(indx, :)*[a;b]) > global_u0)
-    		desc = [desc, y(1:indx, :)];
     		break;
     	endif
     endfor
    
     plot(desc(:,1), desc(:,2), 'linewidth', 2, 'k');
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
     if(global_isLinearSystem == 0)
     	fi_dot = [-1:0.1:1];
